@@ -32,10 +32,17 @@ export function SelectionPage() {
 
   const handleProceed = () => {
     if (selectedDept && selectedYear && selectedSem) {
-      setSelection(selectedDept, selectedYear, selectedSem)
       const dept = departments.find(d => d.id === selectedDept)
       const year = years.find(y => y.id === selectedYear)
       const sem = semesters.find(s => s.id === selectedSem)
+      setSelection(
+        selectedDept,
+        selectedYear,
+        selectedSem,
+        dept?.code || '',
+        year?.value?.toString() || '',
+        sem?.number?.toString() || ''
+      )
       navigate(`/dashboard/${dept?.code}/${year?.value}/${sem?.number}`)
     }
   }

@@ -5,7 +5,17 @@ interface SelectionState {
   departmentId: string | null
   yearId: string | null
   semesterId: string | null
-  setSelection: (departmentId: string, yearId: string, semesterId: string) => void
+  departmentCode: string | null
+  yearValue: string | null
+  semNumber: string | null
+  setSelection: (
+    departmentId: string,
+    yearId: string,
+    semesterId: string,
+    departmentCode: string,
+    yearValue: string,
+    semNumber: string
+  ) => void
   clearSelection: () => void
   hasSelection: () => boolean
 }
@@ -16,12 +26,21 @@ export const useSelection = create<SelectionState>()(
       departmentId: null,
       yearId: null,
       semesterId: null,
-      setSelection: (departmentId: string, yearId: string, semesterId: string) =>
-        set({ departmentId, yearId, semesterId }),
-      clearSelection: () => set({ departmentId: null, yearId: null, semesterId: null }),
+      departmentCode: null,
+      yearValue: null,
+      semNumber: null,
+      setSelection: (
+        departmentId: string,
+        yearId: string,
+        semesterId: string,
+        departmentCode: string,
+        yearValue: string,
+        semNumber: string
+      ) => set({ departmentId, yearId, semesterId, departmentCode, yearValue, semNumber }),
+      clearSelection: () => set({ departmentId: null, yearId: null, semesterId: null, departmentCode: null, yearValue: null, semNumber: null }),
       hasSelection: () => {
-        const { departmentId, yearId, semesterId } = get()
-        return !!(departmentId && yearId && semesterId)
+        const { departmentId, yearId, semesterId, departmentCode, yearValue, semNumber } = get();
+        return !!(departmentId && yearId && semesterId && departmentCode && yearValue && semNumber);
       },
     }),
     {
