@@ -229,18 +229,18 @@ export function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center h-auto sm:h-16 gap-2 py-4 sm:py-0">
             <div>
               <h1 className="text-2xl font-bold text-slate-800">
                 {departmentInfo?.code} - Year {year} - Sem {sem}
               </h1>
               <p className="text-sm text-slate-600">{departmentInfo?.name}</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:space-x-4 w-full sm:w-auto">
               <button
                 onClick={() => navigate('/select')}
                 className="flex items-center px-4 py-2 text-slate-600 hover:text-slate-800 transition-colors"
@@ -261,9 +261,9 @@ export function Dashboard() {
       </header>
 
       {/* Dashboard Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <main className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center">
               <Users className="h-8 w-8 text-blue-500" />
@@ -303,7 +303,7 @@ export function Dashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-8 items-end">
+  <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-4 mb-6 sm:mb-8 items-stretch sm:items-end">
           <button
             onClick={() => navigate('/students/add')}
             className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center font-semibold"
@@ -329,7 +329,7 @@ export function Dashboard() {
 
         {/* Export Panel (shown after clicking Export Reports) */}
         {showExportPanel && (
-          <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8 max-w-xl">
+          <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 w-full max-w-xl">
             <div className="flex gap-2 items-center">
               <label className="text-sm font-medium">From</label>
               <input type="date" value={exportFromDate} onChange={e => setExportFromDate(e.target.value)} className="border px-2 py-1 rounded" />
@@ -373,7 +373,7 @@ export function Dashboard() {
         )}
 
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
             <input
@@ -381,7 +381,7 @@ export function Dashboard() {
               placeholder="Search students by name or registration number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full pl-10 pr-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm sm:text-base"
             />
           </div>
         </div>
@@ -408,7 +408,7 @@ export function Dashboard() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredStudents.map((student) => (
               <StudentCard key={student.id} student={student} onUpdate={fetchStudents} />
             ))}

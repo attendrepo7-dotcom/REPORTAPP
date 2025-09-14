@@ -122,8 +122,8 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
-      <div className="flex justify-between items-center mb-6">
+  <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
         <h3 className="text-xl font-semibold text-gray-900 flex items-center">
           <Calendar className="h-5 w-5 mr-2" />
           Mark Attendance
@@ -136,7 +136,7 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
         </button>
       </div>
 
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+  <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Select Date
@@ -176,14 +176,14 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
         </div>
       </div>
 
-      <div className="space-y-3 max-h-96 overflow-y-auto mb-6">
+  <div className="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto mb-6">
         {students.map((student) => (
-          <div key={student.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div key={student.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-4 bg-gray-50 rounded-lg">
             <div>
               <p className="font-medium text-gray-900">{student.name}</p>
               <p className="text-sm text-gray-600">Reg: {student.reg_no}</p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-row space-x-2 mt-2 sm:mt-0">
               <button
                 onClick={() => handleAttendanceChange(student.id, 'present')}
                 className={`px-4 py-2 rounded-lg transition-colors flex items-center ${
@@ -211,8 +211,8 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
         ))}
       </div>
 
-      <div className="flex justify-between">
-        <div className="flex space-x-2">
+      <div className="flex flex-col sm:flex-row justify-between gap-2 sm:gap-0">
+        <div className="flex flex-row space-x-2 mb-2 sm:mb-0">
           <button
             onClick={() => handleExportAttendance('excel')}
             className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors flex items-center"
@@ -229,7 +229,7 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
           </button>
         </div>
 
-        <div className="flex space-x-4">
+  <div className="flex flex-row space-x-2 sm:space-x-4">
           <button
             onClick={onClose}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"

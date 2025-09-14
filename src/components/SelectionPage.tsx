@@ -48,22 +48,22 @@ export function SelectionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12 pt-8">
-          <h1 className="text-4xl font-bold text-white mb-4">Select Your Course</h1>
-          <p className="text-slate-300 text-lg">Choose department, year, and semester to continue</p>
+  <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-2 sm:p-4">
+  <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12 pt-6 sm:pt-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Select Your Course</h1>
+          <p className="text-slate-300 text-base sm:text-lg">Choose department, year, and semester to continue</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 mb-6 sm:mb-8">
           {/* Department Selection (Dropdown) */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <Building2 className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Department</h3>
             </div>
             <select
-              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedDept}
               onChange={e => setSelectedDept(e.target.value)}
             >
@@ -77,13 +77,13 @@ export function SelectionPage() {
           </div>
 
           {/* Year Selection (Dropdown) */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <Calendar className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Year</h3>
             </div>
             <select
-              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedYear}
               onChange={e => setSelectedYear(e.target.value)}
             >
@@ -97,13 +97,13 @@ export function SelectionPage() {
           </div>
 
           {/* Semester Selection (Dropdown) */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <BookOpen className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Semester</h3>
             </div>
             <select
-              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedSem}
               onChange={e => setSelectedSem(e.target.value)}
             >
@@ -121,7 +121,7 @@ export function SelectionPage() {
           <button
             onClick={handleProceed}
             disabled={!selectedDept || !selectedYear || !selectedSem}
-            className="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-lg inline-flex items-center"
+            className="bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-base sm:text-lg inline-flex items-center"
           >
             Proceed to Dashboard
             <ChevronRight className="ml-2 h-5 w-5" />

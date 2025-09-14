@@ -56,7 +56,7 @@ export function StudentForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <button
@@ -73,7 +73,7 @@ export function StudentForm() {
 
         <div className="bg-white rounded-xl shadow-sm p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Registration Number *
@@ -81,7 +81,7 @@ export function StudentForm() {
                 <input
                   type="text"
                   {...register('reg_no', { required: 'Registration number is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                   placeholder="e.g., 2021001"
                 />
                 {errors.reg_no && (
@@ -96,7 +96,7 @@ export function StudentForm() {
                 <input
                   type="text"
                   {...register('name', { required: 'Name is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                   placeholder="Enter student's full name"
                 />
                 {errors.name && (
@@ -112,7 +112,7 @@ export function StudentForm() {
                 </label>
                 <select
                   {...register('department_id', { required: 'Department is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 >
                   <option value="">Select Department</option>
                   {departmentOptions.map((dept) => (
@@ -130,7 +130,7 @@ export function StudentForm() {
                 </label>
                 <select
                   {...register('year_id', { required: 'Year is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 >
                   <option value="">Select Year</option>
                   {yearOptions.map((year) => (
@@ -148,7 +148,7 @@ export function StudentForm() {
                 </label>
                 <select
                   {...register('semester_id', { required: 'Semester is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 >
                   <option value="">Select Semester</option>
                   {semesterOptions.map((sem) => (
@@ -168,7 +168,7 @@ export function StudentForm() {
                 </label>
                 <select
                   {...register('blood_group')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 >
                   <option value="">Select Blood Group</option>
                   {bloodGroups.map((bg) => (
@@ -184,7 +184,7 @@ export function StudentForm() {
                 <input
                   type="tel"
                   {...register('phone')}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                   placeholder="+91 9876543210"
                 />
               </div>
@@ -197,7 +197,7 @@ export function StudentForm() {
               <input
                 type="email"
                 {...register('email')}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 placeholder="student@example.com"
               />
             </div>
@@ -209,23 +209,23 @@ export function StudentForm() {
               <textarea
                 {...register('address')}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-sm sm:text-base"
                 placeholder="Enter full address"
               />
             </div>
 
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 sm:px-6 py-2 sm:py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 inline-flex items-center"
+                className="bg-orange-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 inline-flex items-center text-sm sm:text-base"
               >
                 <Save className="h-4 w-4 mr-2" />
                 {loading ? 'Saving...' : (isEditing ? 'Update Student' : 'Add Student')}
