@@ -56,76 +56,64 @@ export function SelectionPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-8">
-          {/* Department Selection */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl">
+          {/* Department Selection (Dropdown) */}
+          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <Building2 className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Department</h3>
             </div>
-            <div className="space-y-2">
-              {departments.map((dept) => (
-                <label key={dept.id} className="flex items-center p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="radio"
-                    name="department"
-                    value={dept.id}
-                    checked={selectedDept === dept.id}
-                    onChange={(e) => setSelectedDept(e.target.value)}
-                    className="mr-3 text-orange-500 focus:ring-orange-500"
-                  />
-                  <div>
-                    <div className="font-medium text-slate-800">{dept.code}</div>
-                    <div className="text-sm text-slate-600">{dept.name}</div>
-                  </div>
-                </label>
+            <select
+              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              value={selectedDept}
+              onChange={e => setSelectedDept(e.target.value)}
+            >
+              <option value="">Select Department</option>
+              {departments.map(dept => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.code}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
 
-          {/* Year Selection */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl">
+          {/* Year Selection (Dropdown) */}
+          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <Calendar className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Year</h3>
             </div>
-            <div className="space-y-2">
-              {years.map((year) => (
-                <label key={year.id} className="flex items-center p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="radio"
-                    name="year"
-                    value={year.id}
-                    checked={selectedYear === year.id}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                    className="mr-3 text-orange-500 focus:ring-orange-500"
-                  />
-                  <div className="font-medium text-slate-800">Year {year.label}</div>
-                </label>
+            <select
+              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              value={selectedYear}
+              onChange={e => setSelectedYear(e.target.value)}
+            >
+              <option value="">Select Year</option>
+              {years.map(year => (
+                <option key={year.id} value={year.id}>
+                  Year {year.label}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
 
-          {/* Semester Selection */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl">
+          {/* Semester Selection (Dropdown) */}
+          <div className="bg-white rounded-2xl p-6 shadow-xl flex flex-col">
             <div className="flex items-center mb-4">
               <BookOpen className="h-6 w-6 text-orange-500 mr-2" />
               <h3 className="text-xl font-semibold text-slate-800">Semester</h3>
             </div>
-            <div className="space-y-2">
-              {semesters.map((sem) => (
-                <label key={sem.id} className="flex items-center p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="radio"
-                    name="semester"
-                    value={sem.id}
-                    checked={selectedSem === sem.id}
-                    onChange={(e) => setSelectedSem(e.target.value)}
-                    className="mr-3 text-orange-500 focus:ring-orange-500"
-                  />
-                  <div className="font-medium text-slate-800">Semester {sem.number}</div>
-                </label>
+            <select
+              className="p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800"
+              value={selectedSem}
+              onChange={e => setSelectedSem(e.target.value)}
+            >
+              <option value="">Select Semester</option>
+              {semesters.map(sem => (
+                <option key={sem.id} value={sem.id}>
+                  Semester {sem.number}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         </div>
 

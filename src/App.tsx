@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
@@ -6,7 +7,6 @@ import { AuthForm } from './components/AuthForm'
 import { SelectionPage } from './components/SelectionPage'
 import { Dashboard } from './components/Dashboard'
 import { StudentForm } from './components/StudentForm'
-
 
 function App() {
   const { user, loading } = useAuth();

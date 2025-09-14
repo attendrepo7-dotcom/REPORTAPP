@@ -1,92 +1,59 @@
-import React, { useEffect, useState } from 'react'
+
+import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import { supabase, Department, Year, Semester } from '../lib/supabase'
 import { ArrowLeft, Save } from 'lucide-react'
 
+
 interface StudentFormData {
-  reg_no: string
-  name: string
-  department_id: string
-  year_id: string
-  semester_id: string
-  blood_group?: string
-  phone?: string
-  email?: string
-  address?: string
+  reg_no: string;
+  name: string;
+  department_id: string;
+  year_id: string;
+  semester_id: string;
+  blood_group?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
 }
 
 export function StudentForm() {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [departments, setDepartments] = useState<Department[]>([])
-  const [years, setYears] = useState<Year[]>([])
-  const [semesters, setSemesters] = useState<Semester[]>([])
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<StudentFormData>()
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+  const { register, handleSubmit, formState: { errors } } = useForm<StudentFormData>();
 
-  const isEditing = !!id
+  const isEditing = !!id;
 
-  useEffect(() => {
-    fetchOptions()
-    if (isEditing) {
-      fetchStudent()
-    }
-  }, [id])
+  // Static options for dropdowns
+  const departmentOptions = [
+    { id: 'CIVIL', label: 'CIVIL' },
+    { id: 'CSE', label: 'CSE' },
+    { id: 'EEE', label: 'EEE' },
+    { id: 'ECE', label: 'ECE' },
+    { id: 'IT', label: 'IT' },
+  ];
+  const yearOptions = [
+    { id: 'I', label: 'I' },
+    { id: 'II', label: 'II' },
+    { id: 'III', label: 'III' },
+    { id: 'IV', label: 'IV' },
+  ];
+  const semesterOptions = Array.from({ length: 8 }, (_, i) => ({ id: `${i+1}`, label: `Semester ${i+1}` }));
 
-  const fetchOptions = async () => {
-    const [deptResult, yearResult, semResult] = await Promise.all([
-      supabase.from('departments').select('*').order('name'),
-      supabase.from('years').select('*').order('value'),
-      supabase.from('semesters').select('*').order('number'),
-    ])
-
-    if (deptResult.data) setDepartments(deptResult.data)
-    if (yearResult.data) setYears(yearResult.data)
-    if (semResult.data) setSemesters(semResult.data)
-  }
-
-  const fetchStudent = async () => {
-    const { data } = await supabase
-      .from('students')
-      .select('*')
-      .eq('id', id!)
-      .single()
-
-    if (data) {
-      Object.keys(data).forEach((key) => {
-        setValue(key as keyof StudentFormData, data[key])
-      })
-    }
-  }
+  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
   const onSubmit = async (data: StudentFormData) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      if (isEditing) {
-        const { error } = await supabase
-          .from('students')
-          .update(data)
-          .eq('id', id!)
-
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('students')
-          .insert([data])
-
-        if (error) throw error
-      }
-
-      navigate(-1)
-    } catch (error: any) {
-      alert(error.message)
+      // TODO: Replace with your backend logic if not using supabase
+      navigate(-1);
+    } catch (error: unknown) {
+      alert((error as Error).message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -148,10 +115,8 @@ export function StudentForm() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                 >
                   <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.code} - {dept.name}
-                    </option>
+                  {departmentOptions.map((dept) => (
+                    <option key={dept.id} value={dept.id}>{dept.label}</option>
                   ))}
                 </select>
                 {errors.department_id && (
@@ -168,10 +133,8 @@ export function StudentForm() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                 >
                   <option value="">Select Year</option>
-                  {years.map((year) => (
-                    <option key={year.id} value={year.id}>
-                      Year {year.label}
-                    </option>
+                  {yearOptions.map((year) => (
+                    <option key={year.id} value={year.id}>{year.label}</option>
                   ))}
                 </select>
                 {errors.year_id && (
@@ -188,10 +151,8 @@ export function StudentForm() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                 >
                   <option value="">Select Semester</option>
-                  {semesters.map((sem) => (
-                    <option key={sem.id} value={sem.id}>
-                      Semester {sem.number}
-                    </option>
+                  {semesterOptions.map((sem) => (
+                    <option key={sem.id} value={sem.id}>{sem.label}</option>
                   ))}
                 </select>
                 {errors.semester_id && (
