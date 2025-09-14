@@ -1,8 +1,11 @@
 
+
 import React from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { ArrowLeft, Save } from 'lucide-react'
+import { supabase } from '../lib/supabase'
+
 
 
 interface StudentFormData {
@@ -23,30 +26,64 @@ export function StudentForm() {
   const [loading, setLoading] = React.useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm<StudentFormData>();
 
+
   const isEditing = !!id;
 
-  // Static options for dropdowns
-  const departmentOptions = [
-    { id: 'CIVIL', label: 'CIVIL' },
-    { id: 'CSE', label: 'CSE' },
-    { id: 'EEE', label: 'EEE' },
-    { id: 'ECE', label: 'ECE' },
-    { id: 'IT', label: 'IT' },
-  ];
-  const yearOptions = [
-    { id: 'I', label: 'I' },
-    { id: 'II', label: 'II' },
-    { id: 'III', label: 'III' },
-    { id: 'IV', label: 'IV' },
-  ];
-  const semesterOptions = Array.from({ length: 8 }, (_, i) => ({ id: `${i+1}`, label: `Semester ${i+1}` }));
+
+  // These will be fetched from Supabase for correct UUIDs
+  const [departmentOptions, setDepartmentOptions] = React.useState<{ id: string, code: string, label: string }[]>([]);
+  const [yearOptions, setYearOptions] = React.useState<{ id: string, label: string }[]>([]);
+  const [semesterOptions, setSemesterOptions] = React.useState<{ id: string, label: string }[]>([]);
+
+  React.useEffect(() => {
+    // Fetch department, year, semester options from Supabase
+    async function fetchOptions() {
+      const [deptRes, yearRes, semRes] = await Promise.all([
+        supabase.from('departments').select('id, code, name').order('name'),
+        supabase.from('years').select('id, label').order('value'),
+        supabase.from('semesters').select('id, number').order('number'),
+      ]);
+      setDepartmentOptions(
+        ((deptRes.data as unknown[] | undefined) || []).map((d) => {
+          const dept = d as { id: string; code: string; name: string };
+          return { id: dept.id, code: dept.code, label: dept.code };
+        })
+      );
+      setYearOptions(
+        ((yearRes.data as unknown[] | undefined) || []).map((y) => {
+          const year = y as { id: string; label: string };
+          return { id: year.id, label: year.label };
+        })
+      );
+      setSemesterOptions(
+        ((semRes.data as unknown[] | undefined) || []).map((s) => {
+          const sem = s as { id: string; number: number };
+          return { id: sem.id, label: `Semester ${sem.number}` };
+        })
+      );
+    }
+    fetchOptions();
+  }, []);
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
   const onSubmit = async (data: StudentFormData) => {
     setLoading(true);
     try {
-      // TODO: Replace with your backend logic if not using supabase
+      // Insert student into Supabase
+      const { error } = await supabase.from('students').insert({
+        reg_no: data.reg_no,
+        name: data.name,
+        department_id: data.department_id,
+        year_id: data.year_id,
+        semester_id: data.semester_id,
+        blood_group: data.blood_group,
+        phone: data.phone,
+        email: data.email,
+        address: data.address,
+      });
+      if (error) throw error;
+      alert('Student added successfully!');
       navigate(-1);
     } catch (error: unknown) {
       alert((error as Error).message);
