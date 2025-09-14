@@ -53,6 +53,6 @@ export const formatAttendanceForExport = (
     'Registration No': studentMap[record.student_id]?.reg_no || 'N/A',
     'Date': format(new Date(record.date), 'dd/MM/yyyy'),
     'Status': record.status.charAt(0).toUpperCase() + record.status.slice(1),
-    'Department': studentMap[record.student_id]?.department?.name || 'N/A'
+    'Department': studentMap[record.student_id]?.department?.code || 'N/A'
   }))
 }

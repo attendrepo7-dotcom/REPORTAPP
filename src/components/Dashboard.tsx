@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase, Student, Department, Year, Semester } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
-import { Plus, Users, Calendar, Download, Settings, LogOut, Search } from 'lucide-react'
+import { Plus, Users, Calendar, Download, Settings, LogOut, Search, FileText, FileDown } from 'lucide-react'
+import { exportToExcel, exportToPDF } from '../utils/exports'
 import { StudentCard } from './StudentCard'
 import { AttendancePanel } from './AttendancePanel'
 
@@ -18,6 +19,11 @@ export function Dashboard() {
   const [yearInfo, setYearInfo] = useState<Year | null>(null)
   const [semesterInfo, setSemesterInfo] = useState<Semester | null>(null)
   // Attendance stats state
+  // Export state
+  const [exportFromDate, setExportFromDate] = useState('')
+  const [exportToDate, setExportToDate] = useState('')
+  const [exportLoading, setExportLoading] = useState(false)
+  const [showExportPanel, setShowExportPanel] = useState(false)
   const [presentToday, setPresentToday] = useState<number | null>(null)
   const [absentToday, setAbsentToday] = useState<number | null>(null)
   const [attendanceRate, setAttendanceRate] = useState<number | null>(null)
@@ -94,6 +100,134 @@ export function Dashboard() {
     student.reg_no.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
+  // Export Attendance Report
+  const handleExportAttendance = async (type: 'excel' | 'pdf') => {
+    if (!exportFromDate || !exportToDate) {
+      alert('Please select both From and To dates.');
+      return;
+    }
+    setExportLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('attendance')
+        .select(`*, student:students(*, department:departments(*))`)
+        .gte('date', exportFromDate)
+        .lte('date', exportToDate)
+        .in('student_id', students.map(s => s.id));
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert('No attendance data found for the selected range.');
+        return;
+      }
+      // Format for export
+      const { formatAttendanceForExport } = await import('../utils/exports');
+      const formatted = formatAttendanceForExport(data, students);
+      if (type === 'excel') {
+        exportToExcel(formatted, `attendance_${exportFromDate}_to_${exportToDate}`);
+      } else {
+        // Create temp table for PDF
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = `
+          <h2>Attendance Report (${exportFromDate} to ${exportToDate})</h2>
+          <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Registration No</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Department</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${formatted.map(r => `
+                <tr>
+                  <td>${r['Student Name']}</td>
+                  <td>${r['Registration No']}</td>
+                  <td>${r['Date']}</td>
+                  <td>${r['Status']}</td>
+                  <td>${r['Department']}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        tempDiv.id = 'attendance-export-table';
+        document.body.appendChild(tempDiv);
+        await exportToPDF('attendance-export-table', `attendance_${exportFromDate}_to_${exportToDate}`);
+        document.body.removeChild(tempDiv);
+      }
+    } catch (e) {
+      alert('Export failed: ' + (e as any).message);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  // Export Student Details
+  const handleExportStudents = async (type: 'excel' | 'pdf') => {
+    setExportLoading(true);
+    try {
+      const formatted = students.map(s => ({
+        'Name': s.name,
+        'Registration No': s.reg_no,
+        'Department': s.department?.name || '',
+        'Year': s.year?.label || '',
+        'Semester': s.semester?.number || '',
+        'Blood Group': s.blood_group || '',
+        'Phone': s.phone || '',
+        'Email': s.email || '',
+        'Address': s.address || ''
+      }));
+      if (type === 'excel') {
+        exportToExcel(formatted, 'student_details');
+      } else {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = `
+          <h2>Student Details Report</h2>
+          <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Registration No</th>
+                <th>Department</th>
+                <th>Year</th>
+                <th>Semester</th>
+                <th>Blood Group</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${formatted.map(r => `
+                <tr>
+                  <td>${r['Name']}</td>
+                  <td>${r['Registration No']}</td>
+                  <td>${r['Department']}</td>
+                  <td>${r['Year']}</td>
+                  <td>${r['Semester']}</td>
+                  <td>${r['Blood Group']}</td>
+                  <td>${r['Phone']}</td>
+                  <td>${r['Email']}</td>
+                  <td>${r['Address']}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        tempDiv.id = 'student-details-export-table';
+        document.body.appendChild(tempDiv);
+        await exportToPDF('student-details-export-table', 'student_details');
+        document.body.removeChild(tempDiv);
+      }
+    } catch (e) {
+      alert('Export failed: ' + (e as any).message);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -169,7 +303,7 @@ export function Dashboard() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-8">
+        <div className="flex flex-wrap gap-4 mb-8 items-end">
           <button
             onClick={() => navigate('/students/add')}
             className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center font-semibold"
@@ -184,11 +318,42 @@ export function Dashboard() {
             <Calendar className="h-5 w-5 mr-2" />
             Mark Attendance
           </button>
-          <button className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors inline-flex items-center font-semibold">
+          <button
+            onClick={() => setShowExportPanel((v) => !v)}
+            className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors inline-flex items-center font-semibold"
+          >
             <Download className="h-5 w-5 mr-2" />
             Export Reports
           </button>
         </div>
+
+        {/* Export Panel (shown after clicking Export Reports) */}
+        {showExportPanel && (
+          <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-8 max-w-xl">
+            <div className="flex gap-2 items-center">
+              <label className="text-sm font-medium">From</label>
+              <input type="date" value={exportFromDate} onChange={e => setExportFromDate(e.target.value)} className="border px-2 py-1 rounded" />
+              <label className="text-sm font-medium">To</label>
+              <input type="date" value={exportToDate} onChange={e => setExportToDate(e.target.value)} className="border px-2 py-1 rounded" />
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => handleExportAttendance('excel')} disabled={exportLoading} className="bg-green-500 text-white px-3 py-2 rounded flex items-center text-sm disabled:opacity-50">
+                <FileDown className="h-4 w-4 mr-1" /> Attendance Excel
+              </button>
+              <button onClick={() => handleExportAttendance('pdf')} disabled={exportLoading} className="bg-red-500 text-white px-3 py-2 rounded flex items-center text-sm disabled:opacity-50">
+                <FileText className="h-4 w-4 mr-1" /> Attendance PDF
+              </button>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button onClick={() => handleExportStudents('excel')} disabled={exportLoading} className="bg-blue-500 text-white px-3 py-2 rounded flex items-center text-sm disabled:opacity-50">
+                <FileDown className="h-4 w-4 mr-1" /> Student Excel
+              </button>
+              <button onClick={() => handleExportStudents('pdf')} disabled={exportLoading} className="bg-purple-500 text-white px-3 py-2 rounded flex items-center text-sm disabled:opacity-50">
+                <FileText className="h-4 w-4 mr-1" /> Student PDF
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Attendance Panel */}
         {showAttendance && (
