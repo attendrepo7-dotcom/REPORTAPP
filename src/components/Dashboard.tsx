@@ -17,11 +17,45 @@ export function Dashboard() {
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null)
   const [yearInfo, setYearInfo] = useState<Year | null>(null)
   const [semesterInfo, setSemesterInfo] = useState<Semester | null>(null)
+  // Attendance stats state
+  const [presentToday, setPresentToday] = useState<number | null>(null)
+  const [absentToday, setAbsentToday] = useState<number | null>(null)
+  const [attendanceRate, setAttendanceRate] = useState<number | null>(null)
 
   useEffect(() => {
     fetchStudents()
     fetchCourseInfo()
+    fetchAttendanceStats()
   }, [dept, year, sem])
+  // Helper to get today's date in yyyy-MM-dd
+  function getToday() {
+    const d = new Date()
+    return d.toISOString().slice(0, 10)
+  }
+
+  // Fetch attendance stats for today
+  const fetchAttendanceStats = async () => {
+    if (!dept || !year || !sem) return
+    const today = getToday()
+    const { data, error } = await supabase
+      .from('attendance')
+      .select('status')
+      .eq('date', today)
+      .in('student_id', students.map(s => s.id))
+    if (error) {
+      setPresentToday(null)
+      setAbsentToday(null)
+      setAttendanceRate(null)
+      return
+    }
+    const present = data?.filter((a: any) => a.status === 'present').length || 0
+    const absent = data?.filter((a: any) => a.status === 'absent').length || 0
+    const total = present + absent
+    setPresentToday(present)
+    setAbsentToday(absent)
+    setAttendanceRate(total > 0 ? Math.round((present / total) * 100) : null)
+  }
+
 
   const fetchCourseInfo = async () => {
     const [deptResult, yearResult, semResult] = await Promise.all([
@@ -110,7 +144,7 @@ export function Dashboard() {
               <Calendar className="h-8 w-8 text-green-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Present Today</p>
-                <p className="text-2xl font-semibold text-gray-900">--</p>
+                <p className="text-2xl font-semibold text-gray-900">{presentToday !== null ? presentToday : '--'}</p>
               </div>
             </div>
           </div>
@@ -119,7 +153,7 @@ export function Dashboard() {
               <Users className="h-8 w-8 text-orange-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Absent Today</p>
-                <p className="text-2xl font-semibold text-gray-900">--</p>
+                <p className="text-2xl font-semibold text-gray-900">{absentToday !== null ? absentToday : '--'}</p>
               </div>
             </div>
           </div>
@@ -128,7 +162,7 @@ export function Dashboard() {
               <Download className="h-8 w-8 text-purple-500" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
-                <p className="text-2xl font-semibold text-gray-900">--%</p>
+                <p className="text-2xl font-semibold text-gray-900">{attendanceRate !== null ? attendanceRate + '%' : '--%'}</p>
               </div>
             </div>
           </div>
@@ -165,6 +199,10 @@ export function Dashboard() {
               departmentId={departmentInfo?.id}
               yearId={yearInfo?.id}
               semesterId={semesterInfo?.id}
+              onAttendanceSaved={() => {
+                setShowAttendance(false)
+                fetchAttendanceStats()
+              }}
             />
           </div>
         )}

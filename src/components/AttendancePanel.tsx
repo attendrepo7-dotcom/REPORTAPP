@@ -10,9 +10,10 @@ interface AttendancePanelProps {
   departmentId?: string
   yearId?: string
   semesterId?: string
+  onAttendanceSaved?: () => void
 }
 
-export function AttendancePanel({ students, onClose, departmentId, yearId, semesterId }: AttendancePanelProps) {
+export function AttendancePanel({ students, onClose, departmentId, yearId, semesterId, onAttendanceSaved }: AttendancePanelProps) {
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [attendance, setAttendance] = useState<Record<string, 'present' | 'absent'>>({})
   const [loading, setLoading] = useState(false)
@@ -53,7 +54,8 @@ export function AttendancePanel({ students, onClose, departmentId, yearId, semes
       if (error) throw error
 
       alert('Attendance saved successfully!')
-      onClose()
+      if (onAttendanceSaved) onAttendanceSaved()
+      else onClose()
     } catch (error: any) {
       alert(error.message)
     } finally {
