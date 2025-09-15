@@ -13,6 +13,7 @@ export function Dashboard() {
   const { signOut } = useAuth()
   const [students, setStudents] = useState<Student[]>([])
   const [loading, setLoading] = useState(true)
+  const [studentsError, setStudentsError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [showAttendance, setShowAttendance] = useState(false)
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null)
@@ -31,7 +32,8 @@ export function Dashboard() {
     fetchStudents()
     fetchCourseInfo()
     loadAttendanceSummary()
-  })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   // Load attendance summary from localStorage for today
   function loadAttendanceSummary() {
     const today = getToday();
@@ -72,22 +74,31 @@ export function Dashboard() {
 
   const fetchStudents = async () => {
     setLoading(true)
-    const { data } = await supabase
-      .from('students')
-      .select(`
-        *,
-        department:departments(*),
-        year:years(*),
-        semester:semesters(*)
-      `)
-      .eq('department.code', dept)
-      .eq('year.value', parseInt(year!))
-      .eq('semester.number', parseInt(sem!))
-
-    if (data) {
-      setStudents(data)
+    setStudentsError(null)
+    try {
+      const { data, error } = await supabase
+        .from('students')
+        .select(`
+          *,
+          department:departments(*),
+          year:years(*),
+          semester:semesters(*)
+        `)
+        .eq('department.code', dept)
+        .eq('year.value', parseInt(year!))
+        .eq('semester.number', parseInt(sem!))
+      if (error) throw error
+      setStudents(data || [])
+    } catch (err) {
+      setStudents([])
+      setStudentsError(
+        err && typeof err === 'object' && 'message' in err
+          ? (err as { message?: string }).message || 'Failed to load students.'
+          : 'Failed to load students.'
+      )
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const filteredStudents = students.filter(student =>
@@ -355,8 +366,9 @@ export function Dashboard() {
           <div className="mb-8">
             <AttendancePanel 
               students={students} 
+              studentsLoading={loading}
+              studentsError={studentsError}
               onClose={() => setShowAttendance(false)}
-
               onAttendanceSaved={() => {
                 setShowAttendance(false)
                 loadAttendanceSummary();

@@ -1,4 +1,6 @@
 
+
+
 import { useNavigate } from 'react-router-dom'
 import { Student } from '../lib/supabase'
 import { Edit, Mail, Phone, MapPin, Trash2 } from 'lucide-react'
