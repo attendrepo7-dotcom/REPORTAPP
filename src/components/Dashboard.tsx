@@ -15,7 +15,8 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [studentsError, setStudentsError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [showAttendance, setShowAttendance] = useState(false)
+  // Track which panel is active: 'attendance', 'export', or null
+  const [activePanel, setActivePanel] = useState<null | 'attendance' | 'export'>(null)
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null)
 
   // Attendance stats state
@@ -23,7 +24,7 @@ export function Dashboard() {
   const [exportFromDate, setExportFromDate] = useState('')
   const [exportToDate, setExportToDate] = useState('')
   const [exportLoading, setExportLoading] = useState(false)
-  const [showExportPanel, setShowExportPanel] = useState(false)
+  // Remove showExportPanel, use activePanel instead
   const [presentToday, setPresentToday] = useState<number | null>(null)
   const [absentToday, setAbsentToday] = useState<number | null>(null)
   const [attendanceRate, setAttendanceRate] = useState<number | null>(null)
@@ -177,7 +178,7 @@ export function Dashboard() {
       const formatted = students.map(s => ({
         'Name': s.name,
         'Registration No': s.reg_no,
-        'Department': s.department?.name || '',
+        'Department': s.department?.code || '', // Use abbreviation
         'Year': s.year?.label || '',
         'Semester': s.semester?.number || '',
         'Blood Group': s.blood_group || '',
@@ -186,7 +187,7 @@ export function Dashboard() {
         'Address': s.address || ''
       }));
       if (type === 'excel') {
-        exportToExcel(formatted, 'student_details');
+        exportToExcel(formatted, 'student_details', true); // Pass autofit flag
       } else {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = `
@@ -318,14 +319,14 @@ export function Dashboard() {
             Add Student
           </button>
           <button
-            onClick={() => setShowAttendance(!showAttendance)}
+            onClick={() => setActivePanel(activePanel === 'attendance' ? null : 'attendance')}
             className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors inline-flex items-center font-semibold"
           >
             <Calendar className="h-5 w-5 mr-2" />
             Mark Attendance
           </button>
           <button
-            onClick={() => setShowExportPanel((v) => !v)}
+            onClick={() => setActivePanel(activePanel === 'export' ? null : 'export')}
             className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors inline-flex items-center font-semibold"
           >
             <Download className="h-5 w-5 mr-2" />
@@ -334,7 +335,7 @@ export function Dashboard() {
         </div>
 
         {/* Export Panel (shown after clicking Export Reports) */}
-        {showExportPanel && (
+        {activePanel === 'export' && (
           <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 w-full max-w-xl">
             <div className="flex gap-2 items-center">
               <label className="text-sm font-medium">From</label>
@@ -358,19 +359,22 @@ export function Dashboard() {
                 <FileText className="h-4 w-4 mr-1" /> Student PDF
               </button>
             </div>
+            <div className="flex justify-end mt-2">
+              <button onClick={() => setActivePanel(null)} className="text-gray-500 hover:text-gray-700 px-3 py-1 rounded border">Close</button>
+            </div>
           </div>
         )}
 
         {/* Attendance Panel */}
-        {showAttendance && (
+        {activePanel === 'attendance' && (
           <div className="mb-8">
             <AttendancePanel 
               students={students} 
               studentsLoading={loading}
               studentsError={studentsError}
-              onClose={() => setShowAttendance(false)}
+              onClose={() => setActivePanel(null)}
               onAttendanceSaved={() => {
-                setShowAttendance(false)
+                setActivePanel(null)
                 loadAttendanceSummary();
               }}
             />

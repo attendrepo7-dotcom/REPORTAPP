@@ -4,8 +4,17 @@ import html2canvas from 'html2canvas'
 import { Student, Attendance } from '../lib/supabase'
 import { format } from 'date-fns'
 
-export const exportToExcel = (data: any[], filename: string) => {
+export const exportToExcel = (
+  data: Record<string, string | number | undefined>[], filename: string, autoFit: boolean = false
+) => {
   const ws = XLSX.utils.json_to_sheet(data)
+  if (autoFit) {
+    // Auto-fit columns to content
+    const cols = Object.keys(data[0] || {}).map(key => ({
+      wch: Math.max(key.length, ...data.map(row => (row[key] ? row[key].toString().length : 0))) + 2
+    }))
+    ws['!cols'] = cols
+  }
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
   XLSX.writeFile(wb, `${filename}.xlsx`)
