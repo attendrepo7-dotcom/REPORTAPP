@@ -24,7 +24,7 @@ export function StudentForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = React.useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<StudentFormData>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<StudentFormData>();
 
 
   const isEditing = !!id;
@@ -67,23 +67,69 @@ export function StudentForm() {
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
+  // Fetch student data if editing
+  React.useEffect(() => {
+    async function fetchStudent() {
+      if (isEditing && id) {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('students')
+          .select('*')
+          .eq('id', id)
+          .single();
+        if (!error && data) {
+          reset({
+            reg_no: data.reg_no || '',
+            name: data.name || '',
+            department_id: data.department_id || '',
+            year_id: data.year_id || '',
+            semester_id: data.semester_id || '',
+            blood_group: data.blood_group || '',
+            phone: data.phone || '',
+            email: data.email || '',
+            address: data.address || '',
+          });
+        }
+        setLoading(false);
+      }
+    }
+    fetchStudent();
+  }, [isEditing, id, reset]);
+
   const onSubmit = async (data: StudentFormData) => {
     setLoading(true);
     try {
-      // Insert student into Supabase
-      const { error } = await supabase.from('students').insert({
-        reg_no: data.reg_no,
-        name: data.name,
-        department_id: data.department_id,
-        year_id: data.year_id,
-        semester_id: data.semester_id,
-        blood_group: data.blood_group,
-        phone: data.phone,
-        email: data.email,
-        address: data.address,
-      });
-      if (error) throw error;
-      alert('Student added successfully!');
+      if (isEditing && id) {
+        // Update student in Supabase
+        const { error } = await supabase.from('students').update({
+          reg_no: data.reg_no,
+          name: data.name,
+          department_id: data.department_id,
+          year_id: data.year_id,
+          semester_id: data.semester_id,
+          blood_group: data.blood_group,
+          phone: data.phone,
+          email: data.email,
+          address: data.address,
+        }).eq('id', id);
+        if (error) throw error;
+        alert('Student updated successfully!');
+      } else {
+        // Insert student into Supabase
+        const { error } = await supabase.from('students').insert({
+          reg_no: data.reg_no,
+          name: data.name,
+          department_id: data.department_id,
+          year_id: data.year_id,
+          semester_id: data.semester_id,
+          blood_group: data.blood_group,
+          phone: data.phone,
+          email: data.email,
+          address: data.address,
+        });
+        if (error) throw error;
+        alert('Student added successfully!');
+      }
       navigate(-1);
     } catch (error: unknown) {
       alert((error as Error).message);

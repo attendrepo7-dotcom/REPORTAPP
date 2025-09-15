@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, Department, Year, Semester } from '../lib/supabase'
 import { useSelection } from '../hooks/useSelection'
@@ -66,6 +66,7 @@ export function SelectionPage() {
               className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedDept}
               onChange={e => setSelectedDept(e.target.value)}
+              title="Select Department"
             >
               <option value="">Select Department</option>
               {departments.map(dept => (
@@ -86,6 +87,7 @@ export function SelectionPage() {
               className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedYear}
               onChange={e => setSelectedYear(e.target.value)}
+              title="Select Year"
             >
               <option value="">Select Year</option>
               {years.map(year => (
@@ -106,6 +108,7 @@ export function SelectionPage() {
               className="p-2 sm:p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-orange-500 text-slate-800 text-sm sm:text-base"
               value={selectedSem}
               onChange={e => setSelectedSem(e.target.value)}
+              title="Select Semester"
             >
               <option value="">Select Semester</option>
               {semesters.map(sem => (

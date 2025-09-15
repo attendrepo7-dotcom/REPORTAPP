@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { supabase, Student, Department, Year, Semester } from '../lib/supabase'
+import { supabase, Student, Department } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { Plus, Users, Calendar, Download, Settings, LogOut, Search, FileText, FileDown } from 'lucide-react'
 import { exportToExcel, exportToPDF } from '../utils/exports'
@@ -16,8 +16,7 @@ export function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showAttendance, setShowAttendance] = useState(false)
   const [departmentInfo, setDepartmentInfo] = useState<Department | null>(null)
-  const [yearInfo, setYearInfo] = useState<Year | null>(null)
-  const [semesterInfo, setSemesterInfo] = useState<Semester | null>(null)
+
   // Attendance stats state
   // Export state
   const [exportFromDate, setExportFromDate] = useState('')
@@ -31,48 +30,44 @@ export function Dashboard() {
   useEffect(() => {
     fetchStudents()
     fetchCourseInfo()
-    fetchAttendanceStats()
-  }, [dept, year, sem])
+    loadAttendanceSummary()
+  })
+  // Load attendance summary from localStorage for today
+  function loadAttendanceSummary() {
+    const today = getToday();
+    const key = `attendance-summary-${today}`;
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      try {
+        const summary = JSON.parse(stored);
+        setPresentToday(summary.present ?? 0);
+        setAbsentToday(summary.absent ?? 0);
+        setAttendanceRate(summary.rate ?? 0);
+      } catch {
+        setPresentToday(0);
+        setAbsentToday(0);
+        setAttendanceRate(0);
+      }
+    } else {
+      setPresentToday(0);
+      setAbsentToday(0);
+      setAttendanceRate(0);
+    }
+  }
   // Helper to get today's date in yyyy-MM-dd
   function getToday() {
     const d = new Date()
     return d.toISOString().slice(0, 10)
   }
 
-  // Fetch attendance stats for today
-  const fetchAttendanceStats = async () => {
-    if (!dept || !year || !sem) return
-    const today = getToday()
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('status')
-      .eq('date', today)
-      .in('student_id', students.map(s => s.id))
-    if (error) {
-      setPresentToday(null)
-      setAbsentToday(null)
-      setAttendanceRate(null)
-      return
-    }
-    const present = data?.filter((a: any) => a.status === 'present').length || 0
-    const absent = data?.filter((a: any) => a.status === 'absent').length || 0
-    const total = present + absent
-    setPresentToday(present)
-    setAbsentToday(absent)
-    setAttendanceRate(total > 0 ? Math.round((present / total) * 100) : null)
-  }
+
 
 
   const fetchCourseInfo = async () => {
-    const [deptResult, yearResult, semResult] = await Promise.all([
-      supabase.from('departments').select('*').eq('code', dept).single(),
-      supabase.from('years').select('*').eq('value', parseInt(year!)).single(),
-      supabase.from('semesters').select('*').eq('number', parseInt(sem!)).single(),
-    ])
 
+    const deptResult = await supabase.from('departments').select('*').eq('code', dept).single();
     if (deptResult.data) setDepartmentInfo(deptResult.data)
-    if (yearResult.data) setYearInfo(yearResult.data)
-    if (semResult.data) setSemesterInfo(semResult.data)
+
   }
 
   const fetchStudents = async () => {
@@ -158,7 +153,7 @@ export function Dashboard() {
         document.body.removeChild(tempDiv);
       }
     } catch (e) {
-      alert('Export failed: ' + (e as any).message);
+      alert('Export failed: ' + (e instanceof Error ? e.message : 'Unknown error'));
     } finally {
       setExportLoading(false);
     }
@@ -222,7 +217,7 @@ export function Dashboard() {
         document.body.removeChild(tempDiv);
       }
     } catch (e) {
-      alert('Export failed: ' + (e as any).message);
+      alert('Export failed: ' + (e instanceof Error ? e.message : 'Unknown error'));
     } finally {
       setExportLoading(false);
     }
@@ -332,9 +327,9 @@ export function Dashboard() {
           <div className="flex flex-col gap-2 bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-6 w-full max-w-xl">
             <div className="flex gap-2 items-center">
               <label className="text-sm font-medium">From</label>
-              <input type="date" value={exportFromDate} onChange={e => setExportFromDate(e.target.value)} className="border px-2 py-1 rounded" />
+              <input type="date" value={exportFromDate} onChange={e => setExportFromDate(e.target.value)} className="border px-2 py-1 rounded" title="Export from date" placeholder="YYYY-MM-DD" />
               <label className="text-sm font-medium">To</label>
-              <input type="date" value={exportToDate} onChange={e => setExportToDate(e.target.value)} className="border px-2 py-1 rounded" />
+              <input type="date" value={exportToDate} onChange={e => setExportToDate(e.target.value)} className="border px-2 py-1 rounded" title="Export to date" placeholder="YYYY-MM-DD" />
             </div>
             <div className="flex gap-2 mt-2">
               <button onClick={() => handleExportAttendance('excel')} disabled={exportLoading} className="bg-green-500 text-white px-3 py-2 rounded flex items-center text-sm disabled:opacity-50">
@@ -361,12 +356,10 @@ export function Dashboard() {
             <AttendancePanel 
               students={students} 
               onClose={() => setShowAttendance(false)}
-              departmentId={departmentInfo?.id}
-              yearId={yearInfo?.id}
-              semesterId={semesterInfo?.id}
+
               onAttendanceSaved={() => {
                 setShowAttendance(false)
-                fetchAttendanceStats()
+                loadAttendanceSummary();
               }}
             />
           </div>

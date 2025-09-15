@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { useNavigate } from 'react-router-dom'
 import { Student } from '../lib/supabase'
 import { Edit, Mail, Phone, MapPin, Trash2 } from 'lucide-react'
@@ -36,12 +36,14 @@ export function StudentCard({ student, onUpdate }: StudentCardProps) {
           <button
             onClick={() => navigate(`/students/${student.id}`)}
             className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+            title="Edit student"
           >
             <Edit className="h-4 w-4" />
           </button>
           <button
             onClick={handleDelete}
             className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+            title="Delete student"
           >
             <Trash2 className="h-4 w-4" />
           </button>
